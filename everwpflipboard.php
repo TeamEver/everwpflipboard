@@ -177,12 +177,15 @@ function flipBoardFeed() {
         <dc:creator xmlns:dc="creator">'.$author->display_name.'</dc:creator>
         <description><![CDATA[
         '.strip_tags($postDescription).'
-        ]]></description>';
+        ]]>
+        </description>';
         if ($postThumbnail) {
-            $rss .= '<enclosure url="'.get_the_post_thumbnail_url( $post->ID, 'medium' ).'" length="1000" type="image/jpeg" />';
+            $rss .= '<enclosure url="'.$postThumbnail.'" length="1000" type="image/jpeg" />';
         }
-        $rss .= '<category>'.$defaultCategory.'</category>
-        </item>';
+        if ($defaultCategory) {
+            $rss .= '<category>'.$defaultCategory.'</category>';
+        }
+        $rss .= '</item>';
     }
     $rss.= '</channel>
     </rss>
