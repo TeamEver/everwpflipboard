@@ -16,9 +16,9 @@ if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
 function flipBoardFeed() {
-    $postNumbers = (int)get_option( 'everwpflipboard_qty' );
-    if ($postNumbers <= 0) {
-        $postNumbers = 50;
+    $everwpflipboard_qty = get_option( 'everwpflipboard_qty' );
+    if ($everwpflipboard_qty <= 0) {
+        $everwpflipboard_qty = 50;
     }
     $fields = array('name', 'description', 'wpurl', 'url', 'admin_email', 'charset', 'version', 'html_type', 'text_direction', 'language');
     $blogInfos = array();
@@ -26,7 +26,7 @@ function flipBoardFeed() {
         $blogInfos[$field] = get_bloginfo($field);
     }
     $posts = wp_get_recent_posts(array(
-        'numberposts' => 50, // Number of recent posts thumbnails to display
+        'numberposts' => $everwpflipboard_qty, // Number of recent posts thumbnails to display
         'post_status' => 'publish' // Show only the published posts
     ));
     $flipBoardFile = 'flipboard.xml';
@@ -76,9 +76,6 @@ function flipBoardFeed() {
     ';
     file_put_contents(ABSPATH . '/' .$flipBoardFile, $rss);
 }
-add_action( 'save_post', 'flipBoardFeed', 10, 3 );
-add_action( 'admin_init', 'everwpflipboard_register_settings' );
-
 /* 
  * Register settings 
  */
@@ -101,13 +98,13 @@ function everwpflipboard_register_settings() {
         'general', 
         'site-everwpflipboard-qty' 
     );
-}    
-
+}
 /* 
  * Print settings field content 
  */
-function everwpflipboard_print_input_number() 
-{
-    $everwpflipboard_qty = html_entity_decode( get_option( 'everwpflipboard_qty' ) );
+function everwpflipboard_print_input_number() {
+    $everwpflipboard_qty = get_option( 'everwpflipboard_qty' );
     echo '<input type="number" id="everwpflipboard_qty" name="everwpflipboard_qty" value="' . $everwpflipboard_qty . '" />';
 }
+add_action( 'save_post', 'flipBoardFeed', 10, 3 );
+add_action( 'admin_init', 'everwpflipboard_register_settings' );
