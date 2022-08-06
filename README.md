@@ -10,3 +10,6 @@ This free module allows you to create flipboard.xml file into your WordPress web
 ## How to use ?
 You can add an post in the Flipboard XML file by saving post
 XML will have 50 latest posts
+
+## Example online XML file
+[You can view an XML example by clicking here](https://www.air-journal.fr/flipboard.xml)
