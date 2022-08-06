@@ -12,6 +12,9 @@
  * Copyright:       Cyril CHALAMON - Team Ever
  * Author:       Cyril CHALAMON - Team Ever
  */
+if (!defined('ABSPATH')) {
+  exit; // Exit if accessed directly
+}
 function everwpflipboard_install() {
     $recent_posts = wp_get_recent_posts(array(
         'numberposts' => 10, // Number of recent posts thumbnails to display
@@ -133,17 +136,15 @@ function flipBoardFeed() {
     foreach($fields as $field) {
         $blogInfos[$field] = get_bloginfo($field);
     }
-    $args = array(
-        'meta_key' => 'everwpflipboard',
-        'posts_per_page' => -1
-    );
-    $posts = get_posts($args);
-    if (!$posts || empty($posts)) {
-        $args = array(
-            'posts_per_page' => 10
-        );
-        $posts = get_posts($args);
-    }
+    // $args = array(
+    //     'meta_key' => 'everwpflipboard',
+    //     'posts_per_page' => -1
+    // );
+    // $posts = get_posts($args);
+    $posts = wp_get_recent_posts(array(
+        'numberposts' => 10, // Number of recent posts thumbnails to display
+        'post_status' => 'publish' // Show only the published posts
+    ));
     $flipBoardFile = 'flipboard.xml';
     $rss = '<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
     <channel>
@@ -186,7 +187,7 @@ function flipBoardFeed() {
     $rss.= '</channel>
     </rss>
     ';
-    file_put_contents($flipBoardFile, $rss);
+    file_put_contents(ABSPATH . '/' .$flipBoardFile, $rss);
 }
 add_action('wp_head', 'flipBoardFeed');
 register_activation_hook(__FILE__,'everwpflipboard_install');
