@@ -142,7 +142,7 @@ function flipBoardFeed() {
     // );
     // $posts = get_posts($args);
     $posts = wp_get_recent_posts(array(
-        'numberposts' => 10, // Number of recent posts thumbnails to display
+        'numberposts' => 50, // Number of recent posts thumbnails to display
         'post_status' => 'publish' // Show only the published posts
     ));
     $flipBoardFile = 'flipboard.xml';
@@ -155,35 +155,35 @@ function flipBoardFeed() {
     </description>
     <language>'.$blogInfos['language'].'</language>';
     foreach ($posts as $post) {
-        $author = get_user_by( 'id', $post->post_author );
-        if (empty($post->post_excerpt)) {
-            $postDescription = wp_trim_excerpt($post->post_content);
+        $author = get_user_by( 'id', $post['post_author'] );
+        if (empty($post['post_excerpt'])) {
+            $postDescription = wp_trim_excerpt($post['post_content']);
         } else {
-            $postDescription = $post->post_excerpt;
+            $postDescription = $post['post_excerpt'];
         }
-        $postThumbnail = get_the_post_thumbnail_url( $post->ID, 'medium' );
-        $post_categories = wp_get_post_categories( $post->ID );
+        $postThumbnail = get_the_post_thumbnail_url( $post['ID'], 'medium' );
+        $post_categories = wp_get_post_categories( $post['ID'] );
         $defaultCategory = '';
              
         foreach($post_categories as $c){
             $cat = get_category( $c );
-            $defaultCategory = $cat->name;
+            $defaultCategory .= $cat->name;
         }
         $rss .= '<item>
-        <title>'.$post->post_title.'</title>
-        <link>'.get_permalink($post).'</link>
-        <guid>'.get_permalink($post).'</guid>
-        <pubDate>'.$post->post_date.'</pubDate>
+        <title>'.sanitize_text_field($post['post_title']).'</title>
+        <link>'.get_permalink($post['ID']).'</link>
+        <guid>'.get_permalink($post['ID']).'</guid>
+        <pubDate>'.sanitize_text_field($post['post_date_gmt']).'</pubDate>
         <dc:creator xmlns:dc="creator">'.$author->display_name.'</dc:creator>
         <description><![CDATA[
-        '.strip_tags($postDescription).'
+        '.strip_tags(sanitize_text_field($postDescription)).'
         ]]>
         </description>';
         if ($postThumbnail) {
-            $rss .= '<enclosure url="'.$postThumbnail.'" length="1000" type="image/jpeg" />';
+            $rss .= '<enclosure url="'.sanitize_url($postThumbnail).'" length="1000" type="image/jpeg" />';
         }
         if ($defaultCategory) {
-            $rss .= '<category>'.$defaultCategory.'</category>';
+            $rss .= '<category>'.sanitize_text_field($defaultCategory).'</category>';
         }
         $rss .= '</item>';
     }
