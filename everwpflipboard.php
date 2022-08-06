@@ -16,6 +16,10 @@ if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
 function flipBoardFeed() {
+    $postNumbers = (int)get_option( 'everwpflipboard_qty' );
+    if ($postNumbers <= 0) {
+        $postNumbers = 50;
+    }
     $fields = array('name', 'description', 'wpurl', 'url', 'admin_email', 'charset', 'version', 'html_type', 'text_direction', 'language');
     $blogInfos = array();
     foreach($fields as $field) {
@@ -73,3 +77,37 @@ function flipBoardFeed() {
     file_put_contents(ABSPATH . '/' .$flipBoardFile, $rss);
 }
 add_action( 'save_post', 'flipBoardFeed', 10, 3 );
+add_action( 'admin_init', 'everwpflipboard_register_settings' );
+
+/* 
+ * Register settings 
+ */
+function everwpflipboard_register_settings() {
+    register_setting( 
+        'general', 
+        'everwpflipboard_qty',
+        'esc_html' // <--- Customize this if there are multiple fields
+    );
+    add_settings_section( 
+        'site-everwpflipboard-qty', 
+        'FlipBoard XML file generation', 
+        '__return_false', 
+        'general' 
+    );
+    add_settings_field( 
+        'everwpflipboard_qty', 
+        'Select how many posts to be add on the Flipboard XML file', 
+        'everwpflipboard_print_input_number', 
+        'general', 
+        'site-everwpflipboard-qty' 
+    );
+}    
+
+/* 
+ * Print settings field content 
+ */
+function everwpflipboard_print_input_number() 
+{
+    $everwpflipboard_qty = html_entity_decode( get_option( 'everwpflipboard_qty' ) );
+    echo '<input type="number" id="everwpflipboard_qty" name="everwpflipboard_qty" value="' . $everwpflipboard_qty . '" />';
+}
