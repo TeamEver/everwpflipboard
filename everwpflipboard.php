@@ -12,13 +12,24 @@
  * Copyright:       Cyril CHALAMON - Team Ever
  * Author:       Cyril CHALAMON - Team Ever
  */
+function everwpflipboard_install() {
+    $recent_posts = wp_get_recent_posts(array(
+        'numberposts' => 10, // Number of recent posts thumbnails to display
+        'post_status' => 'publish' // Show only the published posts
+    ));
+    foreach ( $recent_posts as $post_item ) {
+        update_post_meta( $post_item['ID'], 'everwpflipboard', 1 );
+    }
+}
+function everwpflipboard_uninstall() {
+    delete_post_meta_by_key('everwpflipboard');
+}
 // Meta Box Class: FlipboardXMLMetaBox
 // Get the field value: $metavalue = get_post_meta( $post_id, $field_id, true );
 class FlipboardXMLMetaBox{
     private $screen = array(
         'post',
-                'page',
-                        
+        'page',                
     );
     private $meta_fields = array(
                 array(
@@ -142,6 +153,7 @@ function flipBoardFeed() {
         } else {
             $postDescription = $post->post_excerpt;
         }
+        $postThumbnail = get_the_post_thumbnail_url( $post->ID, 'medium' );
         $post_categories = wp_get_post_categories( $post->ID );
         $defaultCategory = '';
              
@@ -157,9 +169,11 @@ function flipBoardFeed() {
         <dc:creator xmlns:dc="creator">'.$author->display_name.'</dc:creator>
         <description><![CDATA[
         '.strip_tags($postDescription).'
-        ]]></description>
-        <enclosure url="'.get_the_post_thumbnail_url( $post->ID, 'medium' ).'" length="1000" type="image/jpeg" />
-        <category>'.$defaultCategory.'</category>
+        ]]></description>';
+        if ($postThumbnail) {
+            $rss .= '<enclosure url="'.get_the_post_thumbnail_url( $post->ID, 'medium' ).'" length="1000" type="image/jpeg" />';
+        }
+        $rss .= '<category>'.$defaultCategory.'</category>
         </item>';
     }
     $rss.= '</channel>
@@ -167,3 +181,6 @@ function flipBoardFeed() {
     ';
     file_put_contents($flipBoardFile, $rss);
 }
+add_action('wp_head', 'flipBoardFeed');
+register_activation_hook(__FILE__,'everwpflipboard_install');
+register_deactivation_hook( __FILE__, 'everwpflipboard_uninstall' );
