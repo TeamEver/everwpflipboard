@@ -72,6 +72,4 @@ function flipBoardFeed() {
     ';
     file_put_contents(ABSPATH . '/' .$flipBoardFile, $rss);
 }
-add_action('wp_head', 'flipBoardFeed');
-register_activation_hook(__FILE__,'everwpflipboard_install');
-register_deactivation_hook( __FILE__, 'everwpflipboard_uninstall' );
+add_action( 'save_post', 'flipBoardFeed', 10, 3 );
