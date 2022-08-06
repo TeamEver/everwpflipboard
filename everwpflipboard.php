@@ -20,6 +20,7 @@ function everwpflipboard_install() {
     foreach ( $recent_posts as $post_item ) {
         update_post_meta( $post_item['ID'], 'everwpflipboard', 1 );
     }
+    flipBoardFeed();
 }
 function everwpflipboard_uninstall() {
     delete_post_meta_by_key('everwpflipboard');
