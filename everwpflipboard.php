@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
 function flipBoardFeed() {
-    $everwpflipboard_qty = get_option( 'everwpflipboard_qty' );
+    $everwpflipboard_qty = (int)get_option( 'everwpflipboard_qty' );
     if ($everwpflipboard_qty <= 0) {
         $everwpflipboard_qty = 50;
     }
@@ -58,7 +58,7 @@ function flipBoardFeed() {
         <link>'.get_permalink($post['ID']).'</link>
         <guid>'.get_permalink($post['ID']).'</guid>
         <pubDate>'.sanitize_text_field($post['post_date_gmt']).'</pubDate>
-        <dc:creator xmlns:dc="creator">'.$author->display_name.'</dc:creator>
+        <dc:creator xmlns:dc="creator">'.sanitize_text_field($author->display_name).'</dc:creator>
         <description><![CDATA[
         '.strip_tags(sanitize_text_field($postDescription)).'
         ]]>
@@ -83,7 +83,7 @@ function everwpflipboard_register_settings() {
     register_setting( 
         'general', 
         'everwpflipboard_qty',
-        'esc_html' // <--- Customize this if there are multiple fields
+        'esc_html'
     );
     add_settings_section( 
         'site-everwpflipboard-qty', 
